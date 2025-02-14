@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Modelos GLB/USDZ a Firebase</title>
+</head>
+<body>
+    <div style="text-align: center; padding: 20px;">
+        <h1>Subir Modelos GLB/USDZ a Firebase</h1>
+        <input type="file" id="fileInput" accept=".glb, .usdz">
+        <button id="uploadButton" style="margin-left: 10px;">Subir Archivo</button>
+        <p id="downloadLink"></p>
+    </div>
+
+    <script>
+        document.getElementById("uploadButton").addEventListener("click", async function() {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Selecciona un archivo primero.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("/api/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error al subir el archivo.");
+                }
+
+                const data = await response.json();
+                const downloadURL = data.url;
+                
+                document.getElementById("downloadLink").innerHTML = 
+                    `📂 Archivo subido: <a href="${downloadURL}" target="_blank">${downloadURL}</a>`;
+                alert("Archivo subido exitosamente.");
+            } catch (error) {
+                console.error(error);
+                alert("Hubo un problema al subir el archivo.");
+            }
+        });
+    </script>
+</body>
+</html>
